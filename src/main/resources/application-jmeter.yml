@@ -1,0 +1,28 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///jmeterdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    pool:
+      initial-size: 10
+      max-size: 50
+      max-idle-time: 30m
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %highlight(%-5level) [%cyan(%logger{20})] %msg%n"
+  level:
+    pe.edu.vallegrande.sigei: INFO
+    org.springframework.r2dbc: INFO
+    io.r2dbc.h2: INFO

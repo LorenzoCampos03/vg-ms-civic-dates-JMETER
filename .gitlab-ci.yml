@@ -1,0 +1,34 @@
+stages:
+  - docker
+  - deploy
+
+variables:
+  IMAGE_NAME: "lorenzo01/vg-ms-sigei-civicdates"
+  DOCKER_TLS_CERTDIR: ""
+  DEPLOY_WEBHOOK_URL: "https://sigei.ddns.net/api/deploy/compose/4vkhwV_DrMMqQdjC-kLmU"
+
+docker_publish:
+  stage: docker
+  image: docker:27.1.2
+  services:
+    - docker:27.1.2-dind
+  before_script:
+    - echo "$DOCKER_TOKEN" | docker login -u "lorenzo01" --password-stdin
+  script:
+    - docker build -t "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA" -t "$IMAGE_NAME:latest" .
+    - docker push "$IMAGE_NAME:$CI_COMMIT_SHORT_SHA"
+    - docker push "$IMAGE_NAME:latest"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop")'
+    - if: "$CI_COMMIT_TAG"
+
+deploy_vps:
+  stage: deploy
+  image: curlimages/curl:8.10.1
+  needs:
+    - docker_publish
+  script:
+    - curl -fsS -X POST "$DEPLOY_WEBHOOK_URL" || curl -fsS "$DEPLOY_WEBHOOK_URL"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop")'
+    - if: "$CI_COMMIT_TAG"

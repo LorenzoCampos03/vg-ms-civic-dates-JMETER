@@ -1,0 +1,30 @@
+spring:
+     r2dbc:
+          url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:civic_dates}?sslMode=${DB_SSL_MODE:disable}&schema=${DB_SCHEMA:public}
+          username: ${DB_USERNAME:postgres}
+          password: ${DB_PASSWORD:postgres}
+          pool:
+               initial-size: 5
+               max-size: 20
+               max-idle-time: 30m
+
+     rabbitmq:
+          host: ${RABBITMQ_HOST:localhost}
+          port: ${RABBITMQ_PORT:5672}
+          username: ${RABBITMQ_USERNAME:guest}
+          password: ${RABBITMQ_PASSWORD:guest}
+
+     security:
+          oauth2:
+               resourceserver:
+                    jwt:
+                         issuer-uri: ${KEYCLOAK_ISSUER_URI:https://sigei.ddns.net/keycloak/realms/sigei}
+                         jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://sigei.ddns.net/keycloak/realms/sigei/protocol/openid-connect/certs}
+
+logging:
+     pattern:
+          console: "%d{HH:mm:ss.SSS} %highlight(%-5level) [%cyan(%logger{20})] %msg%n"
+     level:
+          pe.edu.vallegrande.sigei: DEBUG
+          org.springframework.r2dbc: INFO
+          io.r2dbc.postgresql: INFO
